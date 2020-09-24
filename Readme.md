@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Vsevolod Shabashov](https://up.htmlacademy.ru/javascript/21/user/1158659).
-* Наставник: `Неизвестно`.
+* Наставник: [Александр Карцев](https://htmlacademy.ru/profile/id663289).
 
 ---
 
