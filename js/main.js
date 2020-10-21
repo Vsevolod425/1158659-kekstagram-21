@@ -186,4 +186,21 @@ const photoEffectProportion = function () {
 
 //Валидация хештегов
 
+const hashTagsInput = document.querySelector(`.text__hashtags`);
+const hashTagsInputValue = hashTagsInput.value;
+const hashTags = hashTagsInputValue.split(` `);
+const re = /^#[\w]{1,19}$/;
 
+hashTagsInput.addEventListener(`invalid`, function () {
+  console.log('Проверка');
+  for (let i = 0; i < hashTags.length; i++) {
+    const currentHashTag = hashTags[i];
+    if (currentHashTag !== re) {
+      hashTagsInput.setCustomValidity(`Ошибка ввода`);
+    } else if (hashTags.length >= 5) {
+      hashTagsInput.setCustomValidity(`Количество хештегов не должно превышать пяти`);
+    } else {
+      hashTagsInput.setCustomValidity(``);
+    }
+  }
+});
