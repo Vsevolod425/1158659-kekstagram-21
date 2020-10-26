@@ -119,10 +119,10 @@ const filterMinValue = 0;
 const filterMaxValue = 0;
 const presentFilterValue = ``;
 
-const oldPhotoEffect = ``;
+let oldPhotoEffect = ``;
 
-const addPhotoEffect = function (evt) {
-  const currentPhotoEffect = `effects__preview--` + evt.target.value;
+let addPhotoEffect = function (evt) {
+  let currentPhotoEffect = `effects__preview--` + evt.target.value;
   photoPreview.classList.add(currentPhotoEffect);
   if (oldPhotoEffect !== ``) {
     photoPreview.classList.remove(oldPhotoEffect);
@@ -186,21 +186,21 @@ const photoEffectProportion = function () {
 
 //Валидация хештегов
 
-const hashTagsInput = document.querySelector(`.text__hashtags`);
-const hashTagsInputValue = hashTagsInput.value;
-const hashTags = hashTagsInputValue.split(` `);
+const form = document.querySelector(`#upload-select-image`);
+const hashTagsInput = form.querySelector(`.text__hashtags`);
 const re = /^#[\w]{1,19}$/;
 
-hashTagsInput.addEventListener(`invalid`, function () {
-  console.log('Проверка');
-  for (let i = 0; i < hashTags.length; i++) {
-    const currentHashTag = hashTags[i];
-    if (currentHashTag !== re) {
-      hashTagsInput.setCustomValidity(`Ошибка ввода`);
-    } else if (hashTags.length >= 5) {
-      hashTagsInput.setCustomValidity(`Количество хештегов не должно превышать пяти`);
-    } else {
-      hashTagsInput.setCustomValidity(``);
-    }
+hashTagsInput.addEventListener(`input`, function () {
+  let hashTagsItem = hashTagsInput.value.trim().toLowerCase().split(` `);
+
+  const hashTagsValidity = function (value) {
+    return re.test(value);
+  };
+  const hashTagsCheck = hashTagsItem.every(hashTagsValidity);
+
+  if (hashTagsCheck === false || hashTagsItem.length > 5) {
+    hashTagsInput.setCustomValidity(`Ошибка ввода`);
+  } else {
+    hashTagsInput.setCustomValidity(``);
   }
 });
