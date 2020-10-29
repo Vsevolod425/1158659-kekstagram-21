@@ -79,63 +79,61 @@ for (let i = 0; i < cards.length; i++) {
 const pictureList = document.querySelector(`.pictures`);
 pictureList.appendChild(fragment);
 
-//Окно редактирования изображения
 
-const uploadFile = document.querySelector(`#upload-file`);
-const openForm = document.querySelector(`.img-upload__overlay`);
-const closeForm = openForm.querySelector(`.img-upload__cancel`);
+const uploadFormButton = document.querySelector(`#upload-file`);
+const formWindow = document.querySelector(`.img-upload__overlay`);
+const closeFormButton = formWindow.querySelector(`.img-upload__cancel`);
 
-uploadFile.addEventListener(`change`, function () {
-  openForm.classList.remove(`hidden`);
-});
-
-const onPopupEscPress = function (evt) {
+let onPopupEscPress = function (evt) {
   if (evt.key === `Escape`) {
+    evt.preventDefault();
     closePopup();
   }
 };
 
-const closePopup = function () {
-  openForm.classList.add(`hidden`);
+let openPopup = function () {
+  formWindow.classList.remove(`hidden`);
   document.addEventListener(`keydown`, onPopupEscPress);
-  uploadFile.value = ``;
 };
 
-closeForm.addEventListener(`click`, function () {
+let closePopup = function () {
+  formWindow.classList.add(`hidden`);
+  document.removeEventListener(`keydown`, onPopupEscPress);
+  uploadFormButton.value = ``;
+};
+
+uploadFormButton.addEventListener(`change`, function () {
+  openPopup();
+});
+
+closeFormButton.addEventListener(`click`, function () {
   closePopup();
 });
 
-//Наложение эффекта на фото
 
 const photoPreview = document.querySelector(`.img-upload__preview`);
 const photoEffectList = document.querySelector(`.img-upload__effects`);
 const effectPin = document.querySelector(`.effect-level__pin`);
-const effectFilter = document.querySelector(`.img-upload__preview`);
 const filterWidth = document.querySelector(`.effect-level__line`);
 const filterCheckWidth = document.querySelector(`.effect-level__depth`);
-const filterType = ``;
-const filterUnits = ``;
-const filterMinValue = 0;
-const filterMaxValue = 0;
-const presentFilterValue = ``;
-
+let filterPhotoEffect = `none`;
+let filterType = ``;
+let filterUnits = ``;
+let filterMinValue = 0;
+let filterMaxValue = 0;
 let oldPhotoEffect = ``;
 
-let addPhotoEffect = function (evt) {
+const addPhotoEffect = function (evt) {
+  filterPhotoEffect = evt.target.value;
   let currentPhotoEffect = `effects__preview--` + evt.target.value;
   photoPreview.classList.add(currentPhotoEffect);
+  photoPreview.style.filter = ``;
   if (oldPhotoEffect !== ``) {
     photoPreview.classList.remove(oldPhotoEffect);
   }
   oldPhotoEffect = currentPhotoEffect;
 
   switch (evt.target.value) {
-    case `none`:
-      filterType = ``;
-      filterUnits = ``;
-      filterMinValue = 0;
-      filterMaxValue = 0;
-      break;
     case `chrome`:
       filterType = `grayscale`;
       filterUnits = ``;
@@ -166,28 +164,33 @@ let addPhotoEffect = function (evt) {
       filterMinValue = 1;
       filterMaxValue = 3;
       break;
+    default:
+      filterType = ``;
+      filterUnits = ``;
+      filterMinValue = 0;
+      filterMaxValue = 0;
+      break;
   }
-
-  presentFilterValue = (evt.target.value === `none`) ? effectFilter.style.filter = `` :
-    effectFilter.style.filter = filterType + `(` + filterMaxValue + filterUnits + `)`;
 };
 
 photoEffectList.addEventListener(`change`, addPhotoEffect);
 
-effectPin.addEventListener(`mouseup`, function (evt) {
-  presentFilterValue = (evt.target.value === `none`) ? effectFilter.style.filter = `` :
-    effectFilter.style.filter = filterType + `(` + photoEffectProportion() + filterUnits + `)`;
+effectPin.addEventListener(`mouseup`, function () {
+  if (filterPhotoEffect === `none`) {
+    photoPreview.style.filter = ``;
+  } else {
+    photoPreview.style.filter = `${filterType}(${photoEffectProportion()}${filterUnits})`;
+  }
 });
 
 const photoEffectProportion = function () {
-  const photoEffectAttitude = (filterMaxValue - filterMinValue) / (filterWidth.clientWidth / filterCheckWidth.clientWidth) + filterMinValue;
+  let photoEffectAttitude = (filterMaxValue - filterMinValue) / (filterWidth.clientWidth / filterCheckWidth.clientWidth) + filterMinValue;
   return photoEffectAttitude;
 };
 
-//Валидация хештегов
 
-const form = document.querySelector(`#upload-select-image`);
-const hashTagsInput = form.querySelector(`.text__hashtags`);
+const uploadForm = document.querySelector(`#upload-select-image`);
+const hashTagsInput = uploadForm.querySelector(`.text__hashtags`);
 const re = /^#[\w]{1,19}$/;
 
 hashTagsInput.addEventListener(`input`, function () {
@@ -198,8 +201,10 @@ hashTagsInput.addEventListener(`input`, function () {
   };
   const hashTagsCheck = hashTagsItem.every(hashTagsValidity);
 
-  if (hashTagsCheck === false || hashTagsItem.length > 5) {
+  if (!hashTagsCheck) {
     hashTagsInput.setCustomValidity(`Ошибка ввода`);
+  } else if (hashTagsItem.length > 5) {
+    hashTagsInput.setCustomValidity(`Превышено допустимое количество тегов`);
   } else {
     hashTagsInput.setCustomValidity(``);
   }
